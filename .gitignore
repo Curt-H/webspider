@@ -107,3 +107,6 @@ venv.bak/
 .mypy_cache/
 *.txt
 test.py
+
+# scret file
+secret.py
