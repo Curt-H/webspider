@@ -34,8 +34,10 @@ def cached_url(url, filename):
             return content
 
 
-def save_pics(post_model):
+def save_pics(post_model, index, all):
     m = post_model
+    ix = index
+    a = all
     pic_nums = len(m.pic_urls)
 
     folder = f'bcy\\{m.coser_id}-{m.coser_name}'
@@ -51,8 +53,10 @@ def save_pics(post_model):
         with open(path, 'wb') as f:
             f.write(content)
         sleep(0.5)
-        log(f'下载POST<{m.post_id}>第{i+1}/{pic_nums}图片成功\n'
-            f'URL:{u}')
+        log(f'下载POST<{m.post_id}>中......\n'
+            f'第{i+1}/{pic_nums}图片成功\n'
+            f'URL:{u}\n'
+            f'处理的是第{ix}/{a}个POST')
 
 
 def get_pic_urls(url, filename, post_id):
@@ -107,14 +111,14 @@ def get_post_models(url, index, coser_id):
         post.post_url = f"https://bcy.net{link.attr('href')}"
         post.post_id = post.post_url.split('/')[-1]
         post.pic_urls = get_pic_urls(post.post_url, fname, post.post_id)
-        save_pics(post)
         ms.append(post)
         log(post)
+
     return ms
 
 
 def __main():
-    coser_id = '3768'
+    coser_id = '25216'
     coser_homepage_url = f'https://bcy.net/u/{coser_id}/post?&p=1'
     e = Pq(cached_url(coser_homepage_url, f'{coser_id}-cache-1'))
 
@@ -122,7 +126,11 @@ def __main():
     post_models = []
     for i, u in enumerate(urls):
         post_models += get_post_models(u, i + 1, coser_id)
-    log(f'COSER({coser_id})共{len(post_models)}个POST')
+
+    post_nums = len(post_models)
+    log(f'COSER({coser_id})共{post_nums}个POST')
+    for i, post in enumerate(post_models):
+        save_pics(post, i+1, post_nums)
 
 
 if __name__ == '__main__':
