@@ -17,7 +17,7 @@ def cached_url(url, filename):
     u = url
     fname = filename
 
-    folder = 'bcy'
+    folder = 'bcy\\cache'
     if not os.path.exists(folder):
         os.makedirs(folder)
 
@@ -36,6 +36,7 @@ def cached_url(url, filename):
 
 def save_pics(post_model):
     m = post_model
+    pic_nums = len(m.pic_urls)
 
     folder = f'bcy\\{m.coser_id}-{m.coser_name}'
     if not os.path.exists(folder):
@@ -50,7 +51,7 @@ def save_pics(post_model):
         with open(path, 'wb') as f:
             f.write(content)
         sleep(0.5)
-        log(f'下载POST<{m.post_id}>第{i}图片成功\n'
+        log(f'下载POST<{m.post_id}>第{i+1}/{pic_nums}图片成功\n'
             f'URL:{u}')
 
 
@@ -59,7 +60,7 @@ def get_pic_urls(url, filename, post_id):
     u = url
     fname = filename
 
-    e = Pq(cached_url(u, f'{fname}-post{post_id}'))
+    e = Pq(cached_url(u, f'{fname}-post-{post_id}'))
     pics = e('.detail_std')
     pic_urls = []
 
@@ -74,7 +75,11 @@ def get_posts_urls(pq_root, coser_id):
     e = pq_root('.pager .pager__item a')
     cid = coser_id
 
-    page_nums = int(e.attr('href').split('=')[-1])
+    pager = e.attr('href')
+    if pager is not None:
+        page_nums = int(pager.split('=')[-1])
+    else:
+        page_nums = 1
     log(f'用户<{cid}>POST列表页共有{page_nums}页')
 
     url_template = f'https://bcy.net/u/{cid}/post?&p={{}}'
@@ -109,11 +114,11 @@ def get_post_models(url, index, coser_id):
 
 
 def __main():
-    coser_id = '25216'
+    coser_id = '3768'
     coser_homepage_url = f'https://bcy.net/u/{coser_id}/post?&p=1'
     e = Pq(cached_url(coser_homepage_url, f'{coser_id}-cache-1'))
 
-    urls = get_posts_urls(e, '25216')
+    urls = get_posts_urls(e, coser_id)
     post_models = []
     for i, u in enumerate(urls):
         post_models += get_post_models(u, i + 1, coser_id)
