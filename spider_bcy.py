@@ -117,7 +117,7 @@ def __main():
     post_models = []
     for i, u in enumerate(urls):
         post_models += get_post_models(u, i + 1, coser_id)
-    log(post_models)
+    log(f'COSER({coser_id})共{len(post_models)}个POST')
 
 
 if __name__ == '__main__':
