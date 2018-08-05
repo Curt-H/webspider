@@ -1,6 +1,6 @@
 """
 爬虫, 用于爬取
-https://movie.douban.com/top250
+http://www.mtime.com/top/movie/top100/
 页面的电影信息
 """
 import os
@@ -11,6 +11,8 @@ from utils import log
 
 class Movie(object):
     def __init__(self):
+        # 电影名
+        self.rating = ""
         # 电影名
         self.name = ""
         # 电影评分
@@ -36,7 +38,7 @@ class Movie(object):
         """
         fname = self.name.split('/')[0].replace(' ', '')
 
-        with open(f'cache\\{fname}.md', 'w', encoding='utf-8') as f:
+        with open(f'cache-shiguang\\{fname}.md', 'w', encoding='utf-8') as f:
             f.write(self.__repr__())
             f.write(f'\r\n![{fname}]({fname}.jpg)')
 
@@ -47,21 +49,21 @@ def collect_data(content):
     :param content: 页面HTML源代码
     """
     e = pq(content)
-    items = e(".item")
-    ms = list()
+    items = e('#asyncRatingRegion li')
+    ms = []
 
     for i in items:
         e = pq(i)
-
         m = Movie()
-        m.name = e('.info .title').text().replace(' /', '/')
-        m.score = e('.rating_num').text()
-        m.quote = e('.inq').text()
-        m.hot = e('.star').text().replace(f'{m.score} ', '')
-        m.cover_url = e('div.pic img').attr('src')
-        save_pic(m)
-
+        m.rating = e('.number').text()
+        m.name = e('.mov_con h2').text()
+        m.score = e('.point').text().replace(' ', '')
+        m.quote = e('.mt3').text()
+        m.hot = e('.mov_point p').text()
+        m.cover_url = e('.mov_pic img').attr('src')
         m.save()
+
+        save_pic(m)
         ms.append(m)
         log(m)
 
@@ -89,7 +91,7 @@ def cached_url(url, filename):
     u = url
     fname = filename
 
-    folder = 'cache'
+    folder = 'cache-shiguang'
     if not os.path.exists(folder):
         os.makedirs(folder)
 
@@ -111,22 +113,25 @@ def get_all_page_url():
     :return: URL列表
     """
     urls = list()
-    for i in range(0, 250, 25):
-        url = f"https://movie.douban.com/top250?start={i}"
+    for i in range(10):
+        if i == 0:
+            url = 'http://www.mtime.com/top/movie/top100/'
+        else:
+            url = f'http://www.mtime.com/top/movie/top100/index-{i+1}.html'
         urls.append(url)
     return urls
 
 
 def __main():
-    ms = list()
-    url = get_all_page_url()
-    for i, u in enumerate(url):
+    urls = get_all_page_url()
+    ms = []
+    for i, u in enumerate(urls):
         log(f'URL is {u}')
 
-        content = cached_url(u, f'page{i}').replace(b'&nbsp;', b'')
+        content = cached_url(u, f'page{i}').replace(b'&nbsp;', b'/')
         ms += collect_data(content)
 
-    with open(f'cache\\ALL.md', 'w', encoding='utf-8') as f:
+    with open(f'cache-shiguang\\ALL.md', 'w', encoding='utf-8') as f:
         for m in ms:
             f.write(f'{m}\r\n')
 
