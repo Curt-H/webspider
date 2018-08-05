@@ -1,9 +1,10 @@
 class Post(object):
     def __init__(self):
-        self.post_id = 0
-        self.post_name = ''
+        self.post_id = ''
+        self.post_url = ''
         self.coser_id = ''
-        self.pic_url = []
+        self.coser_name = ''
+        self.pic_urls = []
 
     def __repr__(self):
         result = [f'{k}: {v}' for k, v in self.__dict__.items()]

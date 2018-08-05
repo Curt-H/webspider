@@ -28,8 +28,8 @@ def cached_url(url, filename):
     else:
         r = requests.get(u)
         content = unescape(r.text)
-        log(f'content:\n{content}')
         with open(path, 'w', encoding='utf-8') as f:
+            f.write(content)
             return content
 
 
@@ -46,6 +46,27 @@ def get_posts_urls(pq_root, coser_id):
     return urls
 
 
+def get_post_models(url, index, cid):
+    u = url
+    i = index
+    ms = list()
+    e = Pq(cached_url(u, f'{cid}-cache-{i}'))
+
+    posts = e('.gridList li.js-smallCards')
+    for p in posts:
+        link = Pq(p)('a.db')
+
+        post = Post()
+        post.coser_id = cid
+        post.coser_name = link.attr('title').replace(' ', '')
+        post.post_url = f'https://bcy.net{link.attr("href")}'
+        post.post_id = post.post_url.split('/')[-1]
+        post.post_urls
+        ms.append(post)
+        log(post)
+    return ms
+
+
 def __main():
     coser_id = '25216'
     coser_homepage_url = f'https://bcy.net/u/{coser_id}/post?&p=1'
@@ -54,7 +75,8 @@ def __main():
     urls = get_posts_urls(e, '25216')
     post_models = []
     for i, u in enumerate(urls):
-        get_post_models(u)
+        post_models += get_post_models(u, i + 1, coser_id)
+    log(post_models)
 
 
 if __name__ == '__main__':
