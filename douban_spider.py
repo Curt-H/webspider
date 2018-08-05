@@ -6,24 +6,34 @@ https://movie.douban.com/top250
 import os
 import requests
 from pyquery import PyQuery as pq
-
 from utils import log
 
 
 class Movie(object):
     def __init__(self):
+        # 电影名
         self.name = ""
+        # 电影评分
         self.score = ""
+        # 一句话影评
         self.quote = ""
+        # 热度
         self.hot = ""
+        # 封面URL
         self.cover_url = ""
 
     def __repr__(self):
+        """
+        重定义Print函数
+        """
         attr_list = [f"{k}: {v}" for k, v in self.__dict__.items()]
         result = '\n'.join(attr_list)
         return result
 
     def save(self):
+        """
+        将对象信息生成为一个md文件
+        """
         fname = self.name.split('/')[0].replace(' ', '')
 
         with open(f'cache\\{fname}.md', 'w', encoding='utf-8') as f:
@@ -32,6 +42,10 @@ class Movie(object):
 
 
 def collect_data(content):
+    """
+    分析页面内的数据
+    :param content: 页面HTML源代码
+    """
     e = pq(content)
     items = e(".item")
 
@@ -51,6 +65,10 @@ def collect_data(content):
 
 
 def save_pic(movie):
+    """
+    将封面的图片下载下来
+    :param movie: movie实例
+    """
     fname = movie.name.split('/')[0] + '.jpg'
     fname = fname.replace(' ', '')
 
@@ -59,10 +77,10 @@ def save_pic(movie):
 
 def cached_url(url, filename):
     """
-
-    :param url:
-    :param filename:
-    :return:
+    缓存网页
+    :param url: 网址
+    :param filename: 缓存的名字
+    :return: 返回网页页面的HTML代码
     """
     u = url
     fname = filename
@@ -84,6 +102,10 @@ def cached_url(url, filename):
 
 
 def get_all_page_url():
+    """
+    生成所有的页面URL
+    :return: URL列表
+    """
     urls = list()
     for i in range(0, 250, 25):
         url = f"https://movie.douban.com/top250?start={i}"
