@@ -4,6 +4,7 @@ import os
 from pyquery import PyQuery as Pq
 from html import unescape
 from utils import log
+from time import sleep
 
 
 def cached_url(url, filename):
@@ -33,6 +34,42 @@ def cached_url(url, filename):
             return content
 
 
+def save_pics(post_model):
+    m = post_model
+
+    folder = f'bcy\\{m.coser_id}-{m.coser_name}'
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+
+    for i, u in enumerate(m.pic_urls):
+        fname = f'{m.post_id}-{i}.jpg'
+        path = os.path.join(folder, fname)
+
+        r = requests.get(u)
+        content = r.content
+        with open(path, 'wb') as f:
+            f.write(content)
+        sleep(0.5)
+        log(f'下载POST<{m.post_id}>第{i}图片成功\n'
+            f'URL:{u}')
+
+
+def get_pic_urls(url, filename, post_id):
+    pid = post_id
+    u = url
+    fname = filename
+
+    e = Pq(cached_url(u, f'{fname}-post{post_id}'))
+    pics = e('.detail_std')
+    pic_urls = []
+
+    for p in pics:
+        url = Pq(p).attr('src').replace('/w650', '')
+        pic_urls.append(url)
+
+    return pic_urls
+
+
 def get_posts_urls(pq_root, coser_id):
     e = pq_root('.pager .pager__item a')
     cid = coser_id
@@ -46,11 +83,14 @@ def get_posts_urls(pq_root, coser_id):
     return urls
 
 
-def get_post_models(url, index, cid):
+def get_post_models(url, index, coser_id):
     u = url
     i = index
+    cid = coser_id
+
     ms = list()
-    e = Pq(cached_url(u, f'{cid}-cache-{i}'))
+    fname = f'{cid}-cache-{i}'
+    e = Pq(cached_url(u, fname))
 
     posts = e('.gridList li.js-smallCards')
     for p in posts:
@@ -59,9 +99,10 @@ def get_post_models(url, index, cid):
         post = Post()
         post.coser_id = cid
         post.coser_name = link.attr('title').replace(' ', '')
-        post.post_url = f'https://bcy.net{link.attr("href")}'
+        post.post_url = f"https://bcy.net{link.attr('href')}"
         post.post_id = post.post_url.split('/')[-1]
-        post.post_urls
+        post.pic_urls = get_pic_urls(post.post_url, fname, post.post_id)
+        save_pics(post)
         ms.append(post)
         log(post)
     return ms
