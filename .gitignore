@@ -110,3 +110,4 @@ test.py
 
 # scret file
 secret.py
+cache/
