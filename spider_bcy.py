@@ -52,7 +52,7 @@ def save_pics(post_model, index, all):
         content = r.content
         with open(path, 'wb') as f:
             f.write(content)
-        sleep(0.5)
+        sleep(1)
         log(f'下载POST<{m.post_id}>中......\n'
             f'第{i+1}/{pic_nums}图片成功\n'
             f'URL:{u}\n'
@@ -76,11 +76,12 @@ def get_pic_urls(url, filename, post_id):
 
 
 def get_posts_urls(pq_root, coser_id):
-    e = pq_root('.pager .pager__item a')[-1]
+    e = pq_root('.pager .pager__item a')
     cid = coser_id
 
-    pager = Pq(e).attr('href')
-    if pager is not None:
+    log()
+    if len(e) > 0:
+        pager = Pq(e[-1]).attr('href')
         page_nums = int(pager.split('=')[-1])
     else:
         page_nums = 1
@@ -118,7 +119,7 @@ def get_post_models(url, index, coser_id):
 
 
 def __main():
-    coser_id = '39637'
+    coser_id = '54783'
     coser_homepage_url = f'https://bcy.net/u/{coser_id}/post?&p=1'
     e = Pq(cached_url(coser_homepage_url, f'{coser_id}-cache-1'))
 
