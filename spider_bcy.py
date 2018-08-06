@@ -64,7 +64,7 @@ def get_pic_urls(url, filename, post_id):
     u = url
     fname = filename
 
-    e = Pq(cached_url(u, f'{fname}-post-{post_id}'))
+    e = Pq(cached_url(u, f'{fname}-post-{pid}'))
     pics = e('.detail_std')
     pic_urls = []
 
