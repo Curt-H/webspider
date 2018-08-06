@@ -76,10 +76,10 @@ def get_pic_urls(url, filename, post_id):
 
 
 def get_posts_urls(pq_root, coser_id):
-    e = pq_root('.pager .pager__item a')
+    e = pq_root('.pager .pager__item a')[-1]
     cid = coser_id
 
-    pager = e.attr('href')
+    pager = Pq(e).attr('href')
     if pager is not None:
         page_nums = int(pager.split('=')[-1])
     else:
@@ -118,7 +118,7 @@ def get_post_models(url, index, coser_id):
 
 
 def __main():
-    coser_id = '25216'
+    coser_id = '39637'
     coser_homepage_url = f'https://bcy.net/u/{coser_id}/post?&p=1'
     e = Pq(cached_url(coser_homepage_url, f'{coser_id}-cache-1'))
 
@@ -130,7 +130,7 @@ def __main():
     post_nums = len(post_models)
     log(f'COSER({coser_id})共{post_nums}个POST')
     for i, post in enumerate(post_models):
-        save_pics(post, i+1, post_nums)
+        save_pics(post, i + 1, post_nums)
 
 
 if __name__ == '__main__':
