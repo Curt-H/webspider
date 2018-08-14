@@ -119,7 +119,7 @@ def get_post_models(url, index, coser_id):
 
 
 def __main():
-    coser_id = '54783'
+    coser_id = '5003'
     coser_homepage_url = f'https://bcy.net/u/{coser_id}/post?&p=1'
     e = Pq(cached_url(coser_homepage_url, f'{coser_id}-cache-1'))
 
