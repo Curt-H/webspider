@@ -5,6 +5,7 @@ from pyquery import PyQuery as Pq
 from html import unescape
 from utils import log
 from time import sleep
+import json
 
 
 def cached_url(url, filename):
@@ -118,20 +119,29 @@ def get_post_models(url, index, coser_id):
     return ms
 
 
+def load_coser_namelist():
+    with open('idList.txt', mode='r', encoding='utf-8') as id_file:
+        nl = json.load(id_file)
+        log(nl)
+    return nl
+
+
 def __main():
-    coser_id = '5003'
-    coser_homepage_url = f'https://bcy.net/u/{coser_id}/post?&p=1'
-    e = Pq(cached_url(coser_homepage_url, f'{coser_id}-cache-1'))
+    cosers = load_coser_namelist()
 
-    urls = get_posts_urls(e, coser_id)
-    post_models = []
-    for i, u in enumerate(urls):
-        post_models += get_post_models(u, i + 1, coser_id)
+    for coser_id in cosers:
+        coser_homepage_url = f'https://bcy.net/u/{coser_id}/post?&p=1'
+        e = Pq(cached_url(coser_homepage_url, f'{coser_id}-cache-1'))
 
-    post_nums = len(post_models)
-    log(f'COSER({coser_id})共{post_nums}个POST')
-    for i, post in enumerate(post_models):
-        save_pics(post, i + 1, post_nums)
+        urls = get_posts_urls(e, coser_id)
+        post_models = []
+        for i, u in enumerate(urls):
+            post_models += get_post_models(u, i + 1, coser_id)
+
+        post_nums = len(post_models)
+        log(f'COSER({coser_id})共{post_nums}个POST')
+        for i, post in enumerate(post_models):
+            save_pics(post, i + 1, post_nums)
 
 
 if __name__ == '__main__':
