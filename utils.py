@@ -6,19 +6,23 @@ def log(*args, **kwargs):
     st = strftime('%Y-%m-%d %I:%M:%S', t)
 
     print(f'[{st}]')
-    print(*args)
+    for i in args:
+        print(f'[{i}]')
     for k in kwargs.keys():
-        print(f'{k}={kwargs[k]}')
+        print(f'[{k}={kwargs[k]}]')
+    
+    print()
 
     with open('log.txt', 'a+', encoding='utf-8') as f:
-        print(f'[{st}]', file=f)
-        print(*args, file=f)
+        for i in args:
+            print(f'[{i}]', file=f)
         for k in kwargs.keys():
             print(f'{k}={kwargs[k]}', file=f)
+        print(file=f)
 
 
 if __name__ == '__main__':
-
-    log('test')
-    log('a', c='fuck')
-    log('a', 'fuck')
+    for i in range(10):
+        log('test')
+        log('a', c='fuck')
+        log('a', 'c' ,'b', abc=5)
