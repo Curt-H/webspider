@@ -1,7 +1,8 @@
 from spider_server import WebPage
 from pyquery import PyQuery as pq
-from utils import log
+from utils import log, name_filter
 import os
+from time import sleep
 
 class Novel(object):
     def __init__(self, raw_text):
@@ -13,6 +14,7 @@ class Novel(object):
 
     def get_title(self):
         title = self.pq('title').text().replace("18av,", "")
+        title = name_filter(title)
         log("Title size:", len(title))
         self.title = title
 
@@ -37,8 +39,11 @@ if __name__ == "__main__":
 
     path = input('指定保存路径: ')
 
-    for i in range(8000, 10087):
+    for i in range(3547, 8000):
+        log(i)
         wp = WebPage(f'http://18av.mm-cg.com/novel_{i}.html')
 
         novel = Novel(wp.content)
         novel.save_to_text(path, index=f'{i}')
+
+        sleep(2)

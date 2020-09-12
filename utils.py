@@ -10,7 +10,7 @@ def log(*args, **kwargs):
         print(f'[{i}]')
     for k in kwargs.keys():
         print(f'[{k}={kwargs[k]}]')
-    
+
     print()
 
     with open('log.txt', 'a+', encoding='utf-8') as f:
@@ -21,8 +21,14 @@ def log(*args, **kwargs):
         print(file=f)
 
 
+def name_filter(name: str):
+    ban_list = ('/', '?', '\\', '*', '<', '>', ':', '"')
+    for b in ban_list:
+        name = name.replace(b, '')
+    return name
+
 if __name__ == '__main__':
     for i in range(10):
         log('test')
         log('a', c='fuck')
-        log('a', 'c' ,'b', abc=5)
+        log('a', 'c', 'b', abc=5)
